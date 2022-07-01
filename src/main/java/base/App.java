@@ -24,7 +24,7 @@ public class App {
         try {
             Server.run();
         } catch (IOException e) {
-            System.out.print(e);
+            System.out.println(e);
         }
     }
 

@@ -23,7 +23,7 @@ public class Server {
 			try {
 				propsInput = new FileInputStream(appConfig);
 			} catch (FileNotFoundException e) {
-				System.out.print(e);
+				System.out.println(e);
 			}
 		}
 		if (prop == null) {
@@ -31,7 +31,7 @@ public class Server {
 			try {
 				prop.load(propsInput);
 			} catch (IOException e) {
-				System.out.print(e);
+				System.out.println(e);
 			}
 		}
 
@@ -42,7 +42,7 @@ public class Server {
 			prop.setProperty(key, value);
 			prop.store(inputStream, comments == null ? "" : comments);
 		} catch (IOException e) {
-			System.out.print(e);
+			System.out.println(e);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class Server {
 		try (Reader readStream = new FileReader(appConfig)) {
 			return prop.getProperty(key, defaultValue == null ? "" : defaultValue);
 		} catch (IOException e) {
-			System.out.print(e);
+			System.out.println(e);
 			return "";
 		}
 	}
