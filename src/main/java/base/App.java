@@ -1,5 +1,6 @@
 package base;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +15,19 @@ import org.json.JSONObject;
  *
  */
 public class App {
+
+    public static void main(String[] args) {
+        config.Server.loadInputs();
+        config.Server.setProp("port", "3000", "Server starting port");
+        System.out.println("Hello World!");
+        makeHttpRequest();
+        try {
+            Server.run();
+        } catch (IOException e) {
+            System.out.print(e);
+        }
+    }
+
     public static void makeHttpRequest() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -36,8 +50,4 @@ public class App {
 
     }
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-        makeHttpRequest();
-    }
 }
