@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class HttpResponder {
 	private static String JSON_TYPE = "application/JSON";
 	private static String PLAIN_TXT_TYPE = "text/plain";
-	private static String CHAR_ENCODING = "utf-8";
 
 	public static void sendResponse(HttpServletResponse res, String body) {
 		sendResponse(res, body, 200, JSON_TYPE);
@@ -18,7 +17,7 @@ public class HttpResponder {
 	}
 
 	public static void sendResponse(HttpServletResponse res, String body, int status, String contentType) {
-		res.setCharacterEncoding(CHAR_ENCODING);
+		res.setCharacterEncoding(server.Config.getProp("encoding", "utf-8"));
 		res.setStatus(status);
 		res.setContentType(contentType);
 		try {
