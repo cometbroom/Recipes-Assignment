@@ -1,4 +1,4 @@
-package config;
+package server;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,11 +10,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Properties;
 
-public class Server {
+public class Config {
 	private static File appConfig;
 	private static FileInputStream propsInput;
 	private static Properties prop;
-	private static String filePath = new File("src/main/java/config/server.config").getAbsolutePath();
+	private static String filePath = new File("src/main/java/server/server.config").getAbsolutePath();
 
 	public static void loadInputs() {
 		if (appConfig == null)
