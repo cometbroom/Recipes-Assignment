@@ -9,6 +9,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import routes.RouteMap;
 
 public class App {
 
@@ -19,23 +20,13 @@ public class App {
 		Server server = new Server(threadPool);
 		int port = Integer.parseInt(Config.getProp("port", "3000"));
 		setupConnector(server, port);
+		RouteMap routes = new RouteMap();
 		server.setHandler(new AbstractHandler() {
 			@Override
 			public void handle(String target, Request jettyRequest, HttpServletRequest request,
 					HttpServletResponse response) {
-				response.setCharacterEncoding("utf-8");
-				response.setContentType("text/html");
-				// response.setContentLength(content.length());
-				response.setStatus(200);
-				String content = HTML_CREATE("Hiiiiiiiii");
-
-				try {
-					PrintWriter writer = response.getWriter();
-					writer.write(content, 0, content.length());
-				} catch (Exception e) {
-					System.out.println(e);
-				}
 				jettyRequest.setHandled(true);
+				routes.handleRequest(target, jettyRequest, response);
 			}
 		});
 		try {
