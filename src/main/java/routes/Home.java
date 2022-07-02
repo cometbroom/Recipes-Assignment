@@ -21,6 +21,9 @@ public class Home implements Route {
 	}
 
 	public void getController(Request req, HttpServletResponse res) {
-		HttpResponder.sendResponse(res, "Hiiii, controller works");
+		try {
+			HttpResponder.sendResponse(res, db.Ingredients.getFood());
+		} catch (Exception e) {
+		}
 	}
 }

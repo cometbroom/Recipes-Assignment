@@ -46,6 +46,15 @@ public class Config {
 		}
 	}
 
+	public static String getProp(String key) {
+		try (Reader readStream = new FileReader(appConfig)) {
+			return prop.getProperty(key);
+		} catch (IOException e) {
+			System.out.println(e);
+			return "";
+		}
+	}
+
 	public static String getProp(String key, String defaultValue) {
 		try (Reader readStream = new FileReader(appConfig)) {
 			return prop.getProperty(key, defaultValue == null ? "" : defaultValue);
