@@ -22,8 +22,26 @@ public class Home implements Route {
 
 	public void getController(Request req, HttpServletResponse res) {
 		try {
-			HttpResponder.sendResponse(res, db.Ingredients.getIngredients());
+			HttpResponder.sendResponse(res, db.Tables.getIngredients());
 		} catch (Exception e) {
 		}
+	}
+
+	@Override
+	public void postController(Request req, HttpServletResponse res) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void putController(Request req, HttpServletResponse res) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteController(Request req, HttpServletResponse res) {
+		// TODO Auto-generated method stub
+		
 	}
 }

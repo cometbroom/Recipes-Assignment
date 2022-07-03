@@ -22,6 +22,8 @@ public class RouteMap {
 	public RouteMap() {
 		routesList = new HashMap<String, Route>();
 		routesList.put("/", new Home());
+		routesList.put("recipes", new Recipes());
+
 	}
 
 	public void handleRequest(String target, Request req, HttpServletResponse res) {
