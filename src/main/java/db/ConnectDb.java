@@ -18,6 +18,7 @@ public class ConnectDb {
 	private static Connection getConnection(String db, String user, String pass) {
 		try {
 			connection = DriverManager.getConnection("jdbc:mysql://localhost/" + db, user, pass);
+			System.out.println("Connected to db" + connection.getMetaData());
 			return connection;
 		} catch (SQLException e) {
 			System.out.println(e);

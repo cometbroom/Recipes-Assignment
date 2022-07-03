@@ -22,7 +22,7 @@ public class Home implements Route {
 
 	public void getController(Request req, HttpServletResponse res) {
 		try {
-			HttpResponder.sendResponse(res, db.Ingredients.getFood());
+			HttpResponder.sendResponse(res, db.Ingredients.getIngredients());
 		} catch (Exception e) {
 		}
 	}
