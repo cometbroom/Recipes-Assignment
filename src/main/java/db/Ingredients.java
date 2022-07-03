@@ -1,27 +1,32 @@
 package db;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jooq.JSONFormat;
 import org.jooq.SQLDialect;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.impl.DSL;
 
+import db.sql.IEntity;
+import db.sql.IngredientSQL;
+
 public class Ingredients {
 
 	public static String getIngredients() {
-		try {
-			Connection conn = ConnectDb.getConnection();
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients");
+		IEntity ings = new IngredientSQL();
+		// String result = ings.read("2");
+		// HashMap<String, String> list = new HashMap<String, String>();
+		// list.put("6", "Brussels Sprouts");
+		// list.put("7", "Sesame Seeds");
 
-			return DSL.using(conn, SQLDialect.MYSQL).fetch(rs)
-					.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+		// ings.updateMany(list);
+		ings.deleteMany(new String[] { "28", "29" });
 
-		} catch (SQLException e) {
-			System.out.println("SQLException: " + e.getMessage());
-			System.out.println("SQLState: " + e.getSQLState());
-			System.out.println("VendorError: " + e.getErrorCode());
-			return "";
-		}
+		String result = ings.readMany(0, 5);
+		return result;
+
 	}
 }
