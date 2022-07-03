@@ -1,13 +1,18 @@
 package db.sql;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.jooq.JSONFormat;
 import org.jooq.SQLDialect;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.impl.DSL;
 
-public class IngredientSQL implements IEntity {
+import com.google.gson.Gson;
+
+public class IngredientSQL {
 
 	private final String TABLE_NAME = "ingredients";
 	private final String COLUMN_1 = "id";
@@ -17,27 +22,33 @@ public class IngredientSQL implements IEntity {
 
 	private Connection conn = db.ConnectDb.getConnection();
 
-	@Override
-	public void create(String name) {
+	public String create(String name) {
 		if (wrongName(name))
-			return;
+			return "";
 		try {
 			Statement stmt = conn.createStatement();
 			stmt.executeUpdate(
 					String.format("REPLACE INTO %s VALUES (%s, '%s')", TABLE_NAME, "NULL", name));
+			ResultSet rs = stmt.executeQuery(String.format("SELECT id FROM %s WHERE %s = %s", TABLE_NAME, COLUMN_2, name));
+			return DSL.using(conn, SQLDialect.MYSQL).fetch(rs)
+					.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+
 		} catch (SQLException e) {
 			System.out.println(e);
+			return "";
 		}
 	}
 
-	@Override
-	public void createMany(String[] names) {
+	public String createMany(String[] names) {
+		List<String> list = new ArrayList<String>();
+		Gson g = new Gson();
+
 		for (String name : names) {
-			create(name);
+			list.add(create(name));
 		}
+		return g.toJson(list);
 	}
 
-	@Override
 	public String read(String id) {
 		if (wrongId(id))
 			return "";
@@ -55,7 +66,6 @@ public class IngredientSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public String readMany(int limit, int offset) {
 		try {
 			Statement stmt = conn.createStatement();
@@ -72,7 +82,6 @@ public class IngredientSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public void update(String id, String name) {
 		if (wrongId(id) || wrongName(name))
 			return;
@@ -85,7 +94,6 @@ public class IngredientSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public void updateMany(HashMap<String, String> idNameMap) {
 		for (String key : idNameMap.keySet()) {
 			String value = idNameMap.get(key);
@@ -95,7 +103,6 @@ public class IngredientSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public void delete(String id) {
 		if (wrongId(id))
 			return;
@@ -108,7 +115,6 @@ public class IngredientSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public void deleteMany(String[] ids) {
 		for (String id : ids) {
 			if (wrongId(id))

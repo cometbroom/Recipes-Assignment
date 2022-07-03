@@ -2,12 +2,11 @@ package db;
 
 import db.sql.IEntity;
 import db.sql.IngredientSQL;
-import db.sql.RecipeSQL;
+import db.sql.TwoColumnSQL;
 
 public class Tables {
 
 	public static String getIngredients() {
-		IEntity recp = new RecipeSQL();
 		// String result = ings.read("2");
 		// HashMap<String, String> list = new HashMap<String, String>();
 		// list.put("6", "Brussels Sprouts");
@@ -16,8 +15,8 @@ public class Tables {
 		// ings.updateMany(list);
 		// ings.deleteMany(new String[] { "28", "29" });
 
-		String result = recp.readMany(0, 5);
-		return result;
+		// String result = recp.readMany(0, 5);
+		return "result";
 
 	}
 }

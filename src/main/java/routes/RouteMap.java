@@ -23,6 +23,7 @@ public class RouteMap {
 		routesList = new HashMap<String, Route>();
 		routesList.put("/", new Home());
 		routesList.put("recipes", new Recipes());
+		routesList.put("ingredients", new Ingredients());
 
 	}
 

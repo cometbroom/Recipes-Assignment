@@ -1,43 +1,63 @@
 package db.sql;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.jooq.JSONFormat;
 import org.jooq.SQLDialect;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.impl.DSL;
 
-public class RecipeSQL implements IEntity {
+import com.google.gson.Gson;
 
-	private final String TABLE_NAME = "recipes";
-	private final String COLUMN_1 = "id";
-	private final String COLUMN_2 = "recipe_name";
+public class TwoColumnSQL {
+
 	private final String ALPHABET_P = "^[a-zA-Z ]*$";
 	private final String DIGITS_P = "^[0-9]{1,5}$";
+	private String TABLE_NAME;
+	private String COLUMN_1;
+	private String COLUMN_2;
+
+	public TwoColumnSQL(String table, String col1, String col2) {
+		TABLE_NAME = table;
+		COLUMN_1 = col1;
+		COLUMN_2 = col2;
+	}
 
 	private Connection conn = db.ConnectDb.getConnection();
 
-	@Override
-	public void create(String name) {
+	public String create(String name) {
 		if (wrongName(name))
-			return;
+			return "";
 		try {
 			Statement stmt = conn.createStatement();
 			stmt.executeUpdate(
-					String.format("REPLACE INTO %s VALUES (%s, '%s')", TABLE_NAME, "NULL", name));
+					String.format("INSERT INTO %s VALUES (%s, '%s')", TABLE_NAME, "NULL", name));
+			String sql2 = String.format("SELECT id FROM %s WHERE %s = '%s'", TABLE_NAME, COLUMN_2, name);
+			ResultSet rs = stmt.executeQuery(sql2);
+			return DSL.using(conn, SQLDialect.MYSQL).fetch(rs)
+					.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+
 		} catch (SQLException e) {
 			System.out.println(e);
+			return "";
 		}
 	}
 
-	@Override
-	public void createMany(String[] names) {
+	public String createMany(List<String> names) {
+		String list = "[";
+		Gson g = new Gson();
+
 		for (String name : names) {
-			create(name);
+			list += create(name);
+			list += ",";
 		}
+		list += "]";
+		return list;
 	}
 
-	@Override
 	public String read(String id) {
 		if (wrongId(id))
 			return "";
@@ -55,7 +75,6 @@ public class RecipeSQL implements IEntity {
 		}
 	}
 
-	@Override
 	public String readMany(int limit, int offset) {
 		try {
 			Statement stmt = conn.createStatement();
@@ -72,49 +91,68 @@ public class RecipeSQL implements IEntity {
 		}
 	}
 
-	@Override
-	public void update(String id, String name) {
+	public String update(String id, String name) {
 		if (wrongId(id) || wrongName(name))
-			return;
+			return "";
 		try {
 			Statement stmt = conn.createStatement();
 			String sql = String.format("UPDATE %s SET %s = '%s' WHERE %s = '%s'", TABLE_NAME, COLUMN_2, name, COLUMN_1, id);
 			stmt.executeUpdate(sql);
+			String sql2 = String.format("SELECT * FROM %s WHERE %s = '%s'", TABLE_NAME, COLUMN_1, id);
+			ResultSet rs = stmt.executeQuery(sql2);
+			return DSL.using(conn, SQLDialect.MYSQL).fetch(rs)
+					.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+
 		} catch (SQLException e) {
 			System.out.println(e);
+			return "";
 		}
 	}
 
-	@Override
-	public void updateMany(HashMap<String, String> idNameMap) {
+	public String updateMany(HashMap<String, String> idNameMap) {
+		String list = "[";
+		Gson g = new Gson();
+
 		for (String key : idNameMap.keySet()) {
 			String value = idNameMap.get(key);
 			if (wrongId(key) || wrongName(value))
 				continue;
-			update(key, value);
+			list += update(key, value);
+			list += ",";
 		}
+		list += "]";
+		return list;
 	}
 
-	@Override
-	public void delete(String id) {
+	public String delete(String id) {
 		if (wrongId(id))
-			return;
+			return "";
 		try {
 			Statement stmt = conn.createStatement();
+			String sqlName = String.format("SELECT * FROM %s WHERE %s = '%s'", TABLE_NAME, COLUMN_1, id);
+			ResultSet rs = stmt.executeQuery(sqlName);
+			String jsonRepresentation = DSL.using(conn, SQLDialect.MYSQL).fetch(rs)
+					.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 			String sql = String.format("DELETE FROM %s WHERE %s = '%s'", TABLE_NAME, COLUMN_1, id);
 			stmt.executeUpdate(sql);
+			return jsonRepresentation;
 		} catch (SQLException e) {
 			System.out.println(e);
+			return "";
 		}
 	}
 
-	@Override
-	public void deleteMany(String[] ids) {
+	public String deleteMany(String[] ids) {
+		String list = "[";
+
 		for (String id : ids) {
 			if (wrongId(id))
 				continue;
-			delete(id);
+			list += delete(id);
+			list += ",";
 		}
+		list += "]";
+		return list;
 	}
 
 	private boolean wrongId(String id) {
