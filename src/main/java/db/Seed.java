@@ -17,7 +17,8 @@ public class Seed {
 			"recipe_id int," +
 			"ingredient_id int," +
 			"constraint FOREIGN KEY(recipe_id) references recipes(id) on update cascade on delete cascade," +
-			"constraint FOREIGN KEY(ingredient_id) references ingredients(id) on update cascade on delete cascade);";
+			"constraint FOREIGN KEY(ingredient_id) references ingredients(id) on update cascade on delete cascade," +
+			"constraint PRIMARY KEY(recipe_id, ingredient_id));";
 
 	public static void run() {
 		Connection conn = ConnectDb.getConnection();

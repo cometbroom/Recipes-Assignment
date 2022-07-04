@@ -24,7 +24,7 @@ public class RouteMap {
 		routesList.put("/", new Home());
 		routesList.put("recipes", new Recipes());
 		routesList.put("ingredients", new Ingredients());
-
+		routesList.put("recipeingredients", new RecipeIngredients());
 	}
 
 	public void handleRequest(String target, Request req, HttpServletResponse res) {

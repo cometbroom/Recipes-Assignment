@@ -14,11 +14,12 @@ import com.google.gson.Gson;
 
 public class TwoColumnSQL {
 
-	private final String ALPHABET_P = "^[a-zA-Z ]*$";
-	private final String DIGITS_P = "^[0-9]{1,5}$";
-	private String TABLE_NAME;
-	private String COLUMN_1;
-	private String COLUMN_2;
+	protected final String ALPHABET_P = "^[a-zA-Z ]*$";
+	protected final String DIGITS_P = "^[0-9]{1,5}$";
+	protected String TABLE_NAME;
+	protected String COLUMN_1;
+	protected String COLUMN_2;
+	protected Connection conn = db.ConnectDb.getConnection();
 
 	public TwoColumnSQL(String table, String col1, String col2) {
 		TABLE_NAME = table;
@@ -26,7 +27,6 @@ public class TwoColumnSQL {
 		COLUMN_2 = col2;
 	}
 
-	private Connection conn = db.ConnectDb.getConnection();
 
 	public String create(String name) {
 		if (wrongName(name))
@@ -155,7 +155,7 @@ public class TwoColumnSQL {
 		return list;
 	}
 
-	private boolean wrongId(String id) {
+	protected boolean wrongId(String id) {
 		if (id.matches(DIGITS_P) != true) {
 			System.out.println("Incorrect id " + id);
 			return true;
@@ -163,7 +163,7 @@ public class TwoColumnSQL {
 		return false;
 	}
 
-	private boolean wrongName(String name) {
+	protected boolean wrongName(String name) {
 		if (name.matches(ALPHABET_P) != true) {
 			System.out.println("Incorrect name " + name);
 			return true;
