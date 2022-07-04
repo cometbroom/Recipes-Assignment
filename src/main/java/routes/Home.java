@@ -4,11 +4,9 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Request;
 
 import jakarta.servlet.http.HttpServletResponse;
+import routes.Tools.HttpResponder;
 
 public class Home implements Route {
-
-	public Home() {
-	}
 
 	@Override
 	public void handle(Request req, HttpServletResponse res) {
@@ -22,7 +20,7 @@ public class Home implements Route {
 
 	public void getController(Request req, HttpServletResponse res) {
 		try {
-			HttpResponder.sendResponse(res, db.Tables.getIngredients());
+			HttpResponder.sendResponse(res, "Welcome");
 		} catch (Exception e) {
 		}
 	}
@@ -30,18 +28,18 @@ public class Home implements Route {
 	@Override
 	public void postController(Request req, HttpServletResponse res) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void putController(Request req, HttpServletResponse res) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteController(Request req, HttpServletResponse res) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

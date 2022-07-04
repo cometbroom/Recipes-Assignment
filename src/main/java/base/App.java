@@ -10,7 +10,7 @@ public class App {
         server.Config.setProp("db_pass", "hyfpassword", null);
         db.Seed.run();
 
-        server.App server = new server.App();
+        new server.App();
     }
 
 }

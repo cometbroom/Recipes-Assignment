@@ -12,12 +12,16 @@ import routes.RouteMap;
 public class App {
 
 	public App() {
+		//Prepare reusable threads for our server app
 		QueuedThreadPool threadPool = new QueuedThreadPool();
 		threadPool.setName("server");
 
 		Server server = new Server(threadPool);
 		int port = Integer.parseInt(Config.getProp("port", "3000"));
+		//Setup out connectors for http 1 and 2 compatibility.
 		setupConnector(server, port);
+
+		//Prepare our routes object to run it in the handler
 		RouteMap routes = new RouteMap();
 		server.setHandler(new AbstractHandler() {
 			@Override
@@ -36,6 +40,7 @@ public class App {
 	}
 
 	private void setupConnector(Server server, int port) {
+		//1 acceptor for socket 1 select to pass the request up the chain
 		int acceptors = 1, selectors = 1;
 
 		HttpConfiguration httpConfig = new HttpConfiguration();
@@ -51,9 +56,5 @@ public class App {
 		server.addConnector(connector);
 	}
 
-	private static String HTML_CREATE(String s) {
-		return "<html><head><title>Example</title></head><body><p>" + s
-				+ "</p></body></html>";
-	}
 
 }

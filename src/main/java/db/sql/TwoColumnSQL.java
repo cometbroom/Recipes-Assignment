@@ -1,16 +1,12 @@
 package db.sql;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.jooq.JSONFormat;
 import org.jooq.SQLDialect;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.impl.DSL;
-
-import com.google.gson.Gson;
 
 public class TwoColumnSQL {
 
@@ -26,7 +22,6 @@ public class TwoColumnSQL {
 		COLUMN_1 = col1;
 		COLUMN_2 = col2;
 	}
-
 
 	public String create(String name) {
 		if (wrongName(name))
@@ -48,7 +43,6 @@ public class TwoColumnSQL {
 
 	public String createMany(List<String> names) {
 		String list = "[";
-		Gson g = new Gson();
 
 		for (String name : names) {
 			list += create(name);
@@ -109,21 +103,6 @@ public class TwoColumnSQL {
 		}
 	}
 
-	public String updateMany(HashMap<String, String> idNameMap) {
-		String list = "[";
-		Gson g = new Gson();
-
-		for (String key : idNameMap.keySet()) {
-			String value = idNameMap.get(key);
-			if (wrongId(key) || wrongName(value))
-				continue;
-			list += update(key, value);
-			list += ",";
-		}
-		list += "]";
-		return list;
-	}
-
 	public String delete(String id) {
 		if (wrongId(id))
 			return "";
@@ -140,19 +119,6 @@ public class TwoColumnSQL {
 			System.out.println(e);
 			return "";
 		}
-	}
-
-	public String deleteMany(String[] ids) {
-		String list = "[";
-
-		for (String id : ids) {
-			if (wrongId(id))
-				continue;
-			list += delete(id);
-			list += ",";
-		}
-		list += "]";
-		return list;
 	}
 
 	protected boolean wrongId(String id) {

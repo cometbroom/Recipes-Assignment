@@ -1,9 +1,7 @@
 package routes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Request;
@@ -11,6 +9,7 @@ import org.eclipse.jetty.server.Request;
 import com.google.gson.Gson;
 
 import jakarta.servlet.http.HttpServletResponse;
+import routes.Tools.HttpResponder;
 
 public class Ingredients implements Route {
 
@@ -41,6 +40,7 @@ public class Ingredients implements Route {
 			String limit = req.getParameter("limit");
 			String offset = req.getParameter("offset");
 
+			// Read many or one according to parameters.
 			String result = id == null
 					? _ingredientSQL.readMany(
 							limit == null ? 0 : Integer.parseInt(limit), offset == null ? 0 : Integer.parseInt(offset))
@@ -62,7 +62,7 @@ public class Ingredients implements Route {
 			}
 
 			Gson g = new Gson();
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+			String body = HttpResponder.parseBody(req);
 			routes.DTOs.Ingredient[] ingredients = g.fromJson(body, routes.DTOs.Ingredient[].class);
 			List<String> ingredientsToCreate = new ArrayList<String>();
 
@@ -84,21 +84,11 @@ public class Ingredients implements Route {
 			String name = req.getParameter("name");
 			String result;
 
-			if (id != null && name != null) {
-				result = _ingredientSQL.update(id, name);
-			} else {
-				Gson g = new Gson();
-				String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-				routes.DTOs.Ingredient[] ingredients = g.fromJson(body, routes.DTOs.Ingredient[].class);
-				HashMap<String, String> ingredientsToUpdate = new HashMap<String, String>();
+			if (id == null || name == null)
+				return;
 
-				for (routes.DTOs.Ingredient ingredient : ingredients) {
-					ingredientsToUpdate.put(ingredient.id, ingredient.ingredient_name);
-				}
-				result = _ingredientSQL.updateMany(ingredientsToUpdate);
-			}
+			result = _ingredientSQL.update(id, name);
 			HttpResponder.sendResponse(res, result);
-
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -107,16 +97,13 @@ public class Ingredients implements Route {
 	@Override
 	public void deleteController(Request req, HttpServletResponse res) {
 		try {
-			Gson g = new Gson();
 			String result;
 
 			String id = req.getParameter("id");
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
-			if (id != null)
-				result = _ingredientSQL.delete(id);
-			else
-				result = _ingredientSQL.deleteMany(g.fromJson(body, String[].class));
+			if (id == null)
+				return;
+			result = _ingredientSQL.delete(id);
 			HttpResponder.sendResponse(res, result);
 		} catch (Exception e) {
 			System.out.println(e);

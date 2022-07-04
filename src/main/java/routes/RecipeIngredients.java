@@ -1,16 +1,12 @@
 package routes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Request;
 
 import com.google.gson.Gson;
 
 import jakarta.servlet.http.HttpServletResponse;
+import routes.Tools.HttpResponder;
 
 public class RecipeIngredients implements Route {
 	db.sql.RecipeIngredientsSQL _recipeIngredientsSQL = new db.sql.RecipeIngredientsSQL("recipe_ingredients", "recipe_id",
@@ -41,6 +37,7 @@ public class RecipeIngredients implements Route {
 			String limit = req.getParameter("limit");
 			String offset = req.getParameter("offset");
 
+			// Read many or one according to parameters
 			String result = id == null
 					? _recipeIngredientsSQL.readMany(
 							limit == null ? 0 : Integer.parseInt(limit), offset == null ? 0 : Integer.parseInt(offset))
@@ -54,28 +51,11 @@ public class RecipeIngredients implements Route {
 	@Override
 	public void postController(Request req, HttpServletResponse res) {
 		try {
-			boolean one = Boolean.parseBoolean(req.getParameter("one"));
-
-			if (one) {
-				System.out.println(one);
-
-				Gson g = new Gson();
-				String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-				routes.DTOs.RecipeIngredients recipeIngredients = g.fromJson(body, routes.DTOs.RecipeIngredients.class);
-				HttpResponder.sendResponse(res,
-						_recipeIngredientsSQL.create(recipeIngredients.recipe_name, recipeIngredients.ingredients));
-				return;
-			}
-
 			Gson g = new Gson();
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			routes.DTOs.Recipe[] recipes = g.fromJson(body, routes.DTOs.Recipe[].class);
-			List<String> recipesToCreate = new ArrayList<String>();
 
-			for (routes.DTOs.Recipe recipe : recipes) {
-				recipesToCreate.add(recipe.recipe_name);
-			}
-			String result = _recipeIngredientsSQL.createMany(recipesToCreate);
+			String body = HttpResponder.parseBody(req);
+			routes.DTOs.RecipeIngredients recipeIngredients = g.fromJson(body, routes.DTOs.RecipeIngredients.class);
+			String result = _recipeIngredientsSQL.create(recipeIngredients.recipe_name, recipeIngredients.ingredients);
 
 			HttpResponder.sendResponse(res, result);
 		} catch (Exception e) {
@@ -88,15 +68,12 @@ public class RecipeIngredients implements Route {
 		try {
 			boolean replace = Boolean.parseBoolean(req.getParameter("replace"));
 			Gson g = new Gson();
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+			String body = HttpResponder.parseBody(req);
 			routes.DTOs.RecipeIngredients recipes = g.fromJson(body, routes.DTOs.RecipeIngredients.class);
 			String result = _recipeIngredientsSQL.update(recipes.id, recipes.ingredients, replace);
 
 			HttpResponder.sendResponse(res, result);
-
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			System.out.println(e);
 		}
 	}
@@ -105,7 +82,6 @@ public class RecipeIngredients implements Route {
 	public void deleteController(Request req, HttpServletResponse res) {
 		try {
 			String id = req.getParameter("id");
-
 			if (id == null)
 				return;
 			String result = _recipeIngredientsSQL.delete(id);

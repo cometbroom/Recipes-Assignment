@@ -1,9 +1,7 @@
 package routes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.server.Request;
@@ -11,6 +9,7 @@ import org.eclipse.jetty.server.Request;
 import com.google.gson.Gson;
 
 import jakarta.servlet.http.HttpServletResponse;
+import routes.Tools.HttpResponder;
 
 public class Recipes implements Route {
 
@@ -41,6 +40,7 @@ public class Recipes implements Route {
 			String limit = req.getParameter("limit");
 			String offset = req.getParameter("offset");
 
+			// Read many or one according to parameters.
 			String result = id == null
 					? _recipeSQL.readMany(
 							limit == null ? 0 : Integer.parseInt(limit), offset == null ? 0 : Integer.parseInt(offset))
@@ -55,21 +55,21 @@ public class Recipes implements Route {
 	public void postController(Request req, HttpServletResponse res) {
 		try {
 			String name = req.getParameter("name");
+			String result;
 
-			if (name != null) {
-				HttpResponder.sendResponse(res, _recipeSQL.create(name));
-				return;
+			if (name != null)
+				result = _recipeSQL.create(name);
+			else {
+				Gson g = new Gson();
+				String body = HttpResponder.parseBody(req);
+				routes.DTOs.Recipe[] recipes = g.fromJson(body, routes.DTOs.Recipe[].class);
+				List<String> recipesToCreate = new ArrayList<String>();
+
+				for (routes.DTOs.Recipe recipe : recipes) {
+					recipesToCreate.add(recipe.recipe_name);
+				}
+				result = _recipeSQL.createMany(recipesToCreate);
 			}
-
-			Gson g = new Gson();
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			routes.DTOs.Recipe[] recipes = g.fromJson(body, routes.DTOs.Recipe[].class);
-			List<String> recipesToCreate = new ArrayList<String>();
-
-			for (routes.DTOs.Recipe recipe : recipes) {
-				recipesToCreate.add(recipe.recipe_name);
-			}
-			String result = _recipeSQL.createMany(recipesToCreate);
 
 			HttpResponder.sendResponse(res, result);
 		} catch (Exception e) {
@@ -82,23 +82,12 @@ public class Recipes implements Route {
 		try {
 			String id = req.getParameter("id");
 			String name = req.getParameter("name");
-			String result;
 
-			if (id != null && name != null) {
-				result = _recipeSQL.update(id, name);
-			} else {
-				Gson g = new Gson();
-				String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-				routes.DTOs.Recipe[] recipes = g.fromJson(body, routes.DTOs.Recipe[].class);
-				HashMap<String, String> recipesToUpdate = new HashMap<String, String>();
+			if (id == null || name == null)
+				return;
 
-				for (routes.DTOs.Recipe recipe : recipes) {
-					recipesToUpdate.put(recipe.id, recipe.recipe_name);
-				}
-				result = _recipeSQL.updateMany(recipesToUpdate);
-			}
+			String result = _recipeSQL.update(id, name);
 			HttpResponder.sendResponse(res, result);
-
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -107,16 +96,11 @@ public class Recipes implements Route {
 	@Override
 	public void deleteController(Request req, HttpServletResponse res) {
 		try {
-			Gson g = new Gson();
-
 			String id = req.getParameter("id");
-			String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-
-			if (id != null)
-				_recipeSQL.delete(id);
-			else
-				_recipeSQL.deleteMany(g.fromJson(body, String[].class));
-			HttpResponder.sendResponse(res, "");
+			if (id == null)
+				return;
+			String result = _recipeSQL.delete(id);
+			HttpResponder.sendResponse(res, result);
 		} catch (Exception e) {
 			System.out.println(e);
 		}

@@ -1,12 +1,23 @@
-package routes;
+package routes.Tools;
 
 import java.io.IOException;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Request;
+import java.util.stream.Collectors;
 
 public class HttpResponder {
 	private static String JSON_TYPE = "application/JSON";
 	private static String PLAIN_TXT_TYPE = "text/plain";
+
+	public static String parseBody(Request req) {
+		try {
+			return req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+		} catch (IOException e) {
+			System.out.println("Parsing request body failed: " + e);
+			return "";
+		}
+	}
 
 	public static void sendResponse(HttpServletResponse res, String body) {
 		sendResponse(res, body, 200, JSON_TYPE);

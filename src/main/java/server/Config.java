@@ -16,6 +16,7 @@ public class Config {
 	private static Properties prop;
 	private static String filePath = new File("src/main/java/server/server.config").getAbsolutePath();
 
+	// Load inputs from file
 	public static void loadInputs() {
 		if (appConfig == null)
 			appConfig = new File(filePath);
